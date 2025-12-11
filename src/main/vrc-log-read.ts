@@ -19,6 +19,20 @@ const getLogFilePath = (): string | null => {
   }
 }
 
-const readLog = (): void => {
+const readLog = async (): void => {
+  try {
+    const stat = fs.statSync(getLogFilePath());
+
+    //readfile
+    if (stat.size > 0) {
+      //future plans: response frontend
+      console.log('start loading');
+      await readRange(0, stat.size - 1);
+      console.log('finish loading')
+    } else {
+      console.log('file is empty')
+    }
+  }
+
 
 }
