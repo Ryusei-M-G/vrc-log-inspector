@@ -1,6 +1,7 @@
 # vrc-log-inspector
 
-An Electron application with React and TypeScript
+vrc local log analyzer
+wip
 
 ## Recommended IDE Setup
 
