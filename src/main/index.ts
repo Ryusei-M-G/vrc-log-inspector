@@ -51,7 +51,9 @@ app.whenReady().then(() => {
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
-
+  ipcMain.on('nyowa', () => {
+    console.log('nyowa')
+  })
   createWindow()
 
   app.on('activate', function () {
