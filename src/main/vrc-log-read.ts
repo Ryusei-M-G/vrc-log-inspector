@@ -8,7 +8,8 @@ const username = os.userInfo().username;
 const productionLogPath = path.resolve(
   `C:/Users/${username}/AppData/LocalLow/VRChat/VRChat/`
 )
-const developmentLogPath = path.resolve(process.cwd(), 'test-log.txt')
+const developmentLogPath = path.resolve(process.cwd(), 'sample.txt')
+
 
 const getLogFilePath = (): string | null => {
   // Development mode: use test log file in project root
