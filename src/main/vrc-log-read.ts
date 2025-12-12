@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-import ReadLine from 'node:readline';
+import readline from 'node:readline';
 import path from 'node:path';
 import os from 'node:os';
 
@@ -19,20 +19,27 @@ const getLogFilePath = (): string | null => {
   }
 }
 
-const readLog = async (): void => {
-  try {
-    const stat = fs.statSync(getLogFilePath());
-
-    //readfile
-    if (stat.size > 0) {
-      //future plans: response frontend
-      console.log('start loading');
-      await readRange(0, stat.size - 1);
-      console.log('finish loading')
-    } else {
-      console.log('file is empty')
-    }
+const readFile = () => {
+  const logPath = getLogFilePath();
+  if (!logPath) {
+    console.error('Log file not found');
+    return;
   }
 
+  const stream = fs.createReadStream(logPath, { encoding: 'utf8' });
 
+  const rl = readline.createInterface({
+    input: stream,
+    crlfDelay: Infinity,
+  });
+
+  rl.on('line', (line) => {
+    console.log('line', line);
+  })
+
+  rl.on('close', () => {
+    console.log('finish read');
+  })
 }
+
+export { readFile }
