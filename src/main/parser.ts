@@ -25,6 +25,9 @@ const parsed = (line: string): Parsed | undefined => {
   );
 
   const afterTimeStamp = line.substring(_timeStamp.length).trim();
+
+  //log level - 全文検索だからもしかしたら不適切なやつになるかも
+  //needs fix
   let _logLevel;
   const logLevels = ["Debug", "Warning", "Error"];
 
