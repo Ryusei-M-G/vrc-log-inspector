@@ -1,0 +1,17 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Event {
+    id Int @id @default(autoincrement())
+    timeStamp DateTime
+    loglevel String
+    category String
+    message String
+    createAt DateTime @default(now())
+  }

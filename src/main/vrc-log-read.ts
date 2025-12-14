@@ -3,7 +3,7 @@ import readline from 'node:readline';
 import path from 'node:path';
 import os from 'node:os';
 import { is } from '@electron-toolkit/utils';
-
+import { parsed } from './parser';
 const username = os.userInfo().username;
 const productionLogPath = path.resolve(
   `C:/Users/${username}/AppData/LocalLow/VRChat/VRChat/`
@@ -49,7 +49,7 @@ const readFile = () => {
   });
 
   rl.on('line', (line) => {
-    console.log('line', line);
+    console.log('line', parsed(line));
   })
 
   rl.on('close', () => {
