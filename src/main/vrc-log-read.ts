@@ -34,11 +34,11 @@ const getLogFilePath = (): string | null => {
   }
 }
 
-const readFile = () => {
+const readFile = async () => {
+  const logResult = [];
   const logPath = getLogFilePath();
   if (!logPath) {
-    console.error('Log file not found');
-    return;
+    throw new Error('log file not found');
   }
 
   const stream = fs.createReadStream(logPath, { encoding: 'utf8' });
@@ -48,13 +48,14 @@ const readFile = () => {
     crlfDelay: Infinity,
   });
 
-  rl.on('line', (line) => {
-    console.log('line', parsed(line));
-  })
-
-  rl.on('close', () => {
-    console.log('finish read');
-  })
+  for await (const line of rl) {
+    const parsedData = parsed(line);
+    if (parsedData) {
+      logResult.push(parsedData);
+      console.log(parsedData);
+    }
+  }
+  return logResult
 }
 
 export { readFile }
