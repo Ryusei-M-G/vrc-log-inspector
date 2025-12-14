@@ -26,7 +26,7 @@ const parsed = (line: string): Parsed | undefined => {
 
   const afterTimeStamp = line.substring(_timeStamp.length).trim();
   let _logLevel;
-  const logLevels = ["Debug", "Log", "Warning", "Error"];
+  const logLevels = ["Debug", "Warning", "Error"];
 
   for (const level of logLevels) {
     if (afterTimeStamp.includes(level)) {
