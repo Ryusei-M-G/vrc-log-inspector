@@ -1,9 +1,12 @@
 
 import type { Event } from '../generated/prisma'
 type Parsed = { data: Omit<Event, 'id' | 'createAt'> }
+
 const parsed = (line: string): Parsed | undefined => {
   const timeStampPattern = /^(\d{4}\.\d{2}\.\d{2}\s+\d{2}:\d{2}:\d{2})/;//YYYY.MM.DD HH:MM:SS
   const timeStampMatch = line.match(timeStampPattern);
+
+  //return undefined if no timestamp
   if (!timeStampMatch) {
     return undefined;
   }
