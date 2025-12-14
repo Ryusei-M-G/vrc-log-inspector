@@ -1,7 +1,7 @@
-# vrc-log-inspector
+# vrc-log-inspector(WIP)
 
 vrc local log analyzer
-wip
+
 
 ## Recommended IDE Setup
 
