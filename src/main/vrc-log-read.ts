@@ -4,6 +4,10 @@ import path from 'node:path';
 import os from 'node:os';
 import { is } from '@electron-toolkit/utils';
 import { parsed } from './parser';
+
+import type { Event } from '../generated/prisma'
+type Parsed = { data: Omit<Event, 'id' | 'createAt'> }
+
 const username = os.userInfo().username;
 const productionLogPath = path.resolve(
   `C:/Users/${username}/AppData/LocalLow/VRChat/VRChat/`
@@ -35,7 +39,7 @@ const getLogFilePath = (): string | null => {
 }
 
 const readFile = async () => {
-  const logResult = [];
+  const logResult: Parsed[] = [];
   const logPath = getLogFilePath();
   if (!logPath) {
     throw new Error('log file not found');
@@ -52,9 +56,9 @@ const readFile = async () => {
     const parsedData = parsed(line);
     if (parsedData) {
       logResult.push(parsedData);
-      console.log(parsedData);
     }
   }
+  console.log(logResult);
   return logResult
 }
 
