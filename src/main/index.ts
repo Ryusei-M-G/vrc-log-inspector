@@ -48,7 +48,10 @@ app.whenReady().then(() => {
 
   //IPC
   ipcMain.on('nyowa', () => console.log('nyowa'))
-  ipcMain.on('readFile', () => readFile())
+  ipcMain.handle('readFile', async () => {
+    const result = await readFile()
+    return result
+  })
   createWindow()
 
   app.on('activate', function () {
