@@ -54,12 +54,10 @@ const parsed = (line: string): Parsed | undefined => {
   }
   //return parsed data
   return {
-    data: {
-      timeStamp: timeStamp,
-      loglevel: _logLevel,
-      category: _category,
-      message: _message,
-    }
+    timeStamp: timeStamp,
+    loglevel: _logLevel,
+    category: _category,
+    message: _message,
   }
 }
 
