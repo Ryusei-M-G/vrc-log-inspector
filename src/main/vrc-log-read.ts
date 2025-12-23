@@ -4,9 +4,7 @@ import path from 'node:path';
 import os from 'node:os';
 import { is } from '@electron-toolkit/utils';
 import { parsed } from './parser';
-
-import type { Event } from '../generated/prisma'
-type Parsed = { data: Omit<Event, 'id' | 'createAt'> }
+import type { Parsed } from '../types'
 
 const username = os.userInfo().username;
 const productionLogPath = path.resolve(

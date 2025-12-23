@@ -1,7 +1,5 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
-import type { Event } from '../generated/prisma'
-
-type Parsed = { data: Omit<Event, 'id' | 'createAt'> }
+import type { Parsed } from '../types'
 
 interface Api {
   readFile: () => Promise<Parsed[]>
