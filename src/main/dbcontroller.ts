@@ -6,15 +6,15 @@ const adapter = new PrismaBetterSqlite3({ url: 'file:./dev.db' })
 const prisma = new PrismaClient({ adapter })
 
 export const saveLogsToDb = async (logs: Parsed[]) => {
-  try {
-    const result = await prisma.event.createMany({
-      data: logs,
-      skipDuplicates: true,
-    })
-    return result;
-  } catch (error) {
-    return error;
-  }
+  const queries = logs.map(log => {
+    const timeStamp = new Date(log.timeStamp).toISOString()
+    return prisma.$executeRaw`
+      INSERT OR IGNORE INTO Event (timeStamp, loglevel, category, message, createAt)
+      VALUES (${timeStamp}, ${log.loglevel}, ${log.category}, ${log.message}, ${new Date().toISOString()})
+    `
+  })
+  await prisma.$transaction(queries)
+  return { count: logs.length }
 }
 
 //test
@@ -22,7 +22,6 @@ export const saveLogsToDb = async (logs: Parsed[]) => {
 export const getLogs = async () => {
   try {
     const result = await prisma.event.findMany();
-    console.log(result);
     return result;
   } catch (error) {
     console.log(error)
