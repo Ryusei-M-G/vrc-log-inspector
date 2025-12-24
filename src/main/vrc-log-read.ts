@@ -56,7 +56,6 @@ const readFile = async () => {
       logResult.push(parsedData);
     }
   }
-  console.log(logResult);
   return logResult
 }
 
