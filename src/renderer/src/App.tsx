@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Parsed } from '../../types'
+import LogMonitor from './components/LogMonitor'
 
 function App(): React.JSX.Element {
   const [logs, setLogs] = useState<Parsed[]>([]);
@@ -22,6 +23,8 @@ function App(): React.JSX.Element {
           {JSON.stringify(logs, null, 2)}
         </pre>
       </div>
+      {/* 仮実装: LogMonitor */}
+      <LogMonitor logs={logs} />
     </>
   )
 }
