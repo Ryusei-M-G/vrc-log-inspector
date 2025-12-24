@@ -4,6 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
 import { readFile } from './vrc-log-read'
+import { saveLogsToDb, getLogs } from './dbcontroller'
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -50,7 +51,9 @@ app.whenReady().then(() => {
   ipcMain.on('nyowa', () => console.log('nyowa'))
   ipcMain.handle('readFile', async () => {
     const result = await readFile()
-    return result
+    saveLogsToDb(result);
+
+    return getLogs();
   })
   createWindow()
 
