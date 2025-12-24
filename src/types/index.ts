@@ -1,3 +1,3 @@
-import type { Event } from '../generated/prisma'
+import type { Prisma } from '../generated/prisma/client'
 
-export type Parsed = Omit<Event, 'id' | 'createAt'>
+export type Parsed = Prisma.EventCreateManyInput
