@@ -51,7 +51,7 @@ app.whenReady().then(() => {
   ipcMain.on('nyowa', () => console.log('nyowa'))
   ipcMain.handle('readFile', async () => {
     const result = await readFile()
-    saveLogsToDb(result);
+    await saveLogsToDb(result);
 
     return getLogs();
   })
