@@ -3,7 +3,16 @@ import { defineConfig } from 'electron-vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
-  main: {},
+  main: {
+    build: {
+      commonjsOptions: {
+        include: [/generated\/prisma/]
+      },
+      rollupOptions: {
+        external: ['better-sqlite3', '@prisma/client']
+      }
+    }
+  },
   preload: {},
   renderer: {
     resolve: {
