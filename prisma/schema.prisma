@@ -14,4 +14,6 @@ model Event {
     category String
     message String
     createAt DateTime @default(now())
+
+    @@unique([timeStamp, message])
   }

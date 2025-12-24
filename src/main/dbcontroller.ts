@@ -9,6 +9,7 @@ export const saveLogsToDb = async (logs: Parsed[]) => {
   try {
     const result = await prisma.event.createMany({
       data: logs,
+      skipDuplicates: true,
     })
     return result;
   } catch (error) {
