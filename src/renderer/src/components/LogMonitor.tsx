@@ -10,8 +10,10 @@ const LogMonitor = ({ logs }: LogMonitorProps) => {
     <div>
       {logs.map((log) => {
         return (
-          <div key={log.id}>
-            {log.message}
+          <div key={log.id} className="border rounded">
+            <div>loglevel:{log.loglevel}</div>
+            <div>category:{log.category}</div>
+            <div>logs:{log.message}</div>
           </div>
         )
       })}
