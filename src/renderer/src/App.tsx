@@ -9,14 +9,16 @@ function App(): React.JSX.Element {
   const handleReadFile = async (): Promise<void> => {
     const data = await window.api.readFile()
     setLogs(data)
-    console.log('Fetched data:', data)
-    console.log('Logs state:', logs)
   }
+
+  const buttonStyle = 'border rounded-md gap-2 p-2 m-1 text-zinc-800'
   return (
     <>
-      <button onClick={ipcHandle}>button</button>
-      <button onClick={nyowaHandle}>nyowa</button>
-      <button onClick={handleReadFile}>readFile</button>
+      <div className='gap-2 m-4'>
+        <button onClick={ipcHandle} className={buttonStyle}>button</button>
+        <button onClick={nyowaHandle} className={buttonStyle}>nyowa</button>
+        <button onClick={handleReadFile} className={buttonStyle}>readFile</button>
+      </div>
       <div style={{ textAlign: 'center' }}>
         <h2>Logs ({logs.length})</h2>
         <pre style={{ textAlign: 'left', maxHeight: '500px', overflow: 'auto' }}>
