@@ -8,15 +8,13 @@ const LogMonitor = ({ logs }: LogMonitorProps) => {
 
   return (
     <div>
-      <ul>
-        {logs.map((log) => {
-          return (
-            <li key={log.id}>
-              {log.message}
-            </li>
-          )
-        })}
-      </ul>
+      {logs.map((log) => {
+        return (
+          <div key={log.id}>
+            {log.message}
+          </div>
+        )
+      })}
     </div>
   )
 }
