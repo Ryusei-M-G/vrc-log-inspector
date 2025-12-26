@@ -48,14 +48,14 @@ app.whenReady().then(() => {
   })
 
   //IPC
-  ipcMain.handle('readFile', async () => {
+  ipcMain.handle('getLog', async () => {
     const dbLog = await getLogs()
     return dbLog;
   })
+
   ipcMain.handle('saveToDb', async () => {
     const result = await readFile()
     await saveLogsToDb(result);
-    console.log('saveToDb')
   })
   createWindow()
 

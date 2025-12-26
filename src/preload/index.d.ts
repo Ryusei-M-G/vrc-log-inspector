@@ -2,7 +2,7 @@ import { ElectronAPI } from '@electron-toolkit/preload'
 import type { Parsed } from '../types'
 
 interface Api {
-  readFile: () => Promise<Parsed[]>
+  getLog: () => Promise<Parsed[]>
   saveToDb: () => Promise<void>
 }
 

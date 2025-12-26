@@ -5,7 +5,7 @@ import LogMonitor from './components/LogMonitor'
 function App(): React.JSX.Element {
   const [logs, setLogs] = useState<Parsed[]>([]);
   const handleReadFile = async (): Promise<void> => {
-    const data = await window.api.readFile()
+    const data = await window.api.getLog()
     setLogs(data)
   }
 
@@ -17,7 +17,7 @@ function App(): React.JSX.Element {
   return (
     <div className="h-screen flex flex-col bg-zinc-800 text-white">
       <header className="h-14 shrink-0 flex items-center gap-2 px-4 bg-zinc-900 border-b border-zinc-700">
-        <button onClick={handleReadFile} className={buttonStyle}>readFile</button>
+        <button onClick={handleReadFile} className={buttonStyle}>getLog</button>
         <button onClick={handleDB} className={buttonStyle}>db</button>
       </header>
 
