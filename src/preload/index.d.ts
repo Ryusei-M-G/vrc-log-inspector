@@ -3,6 +3,7 @@ import type { Parsed } from '../types'
 
 interface Api {
   readFile: () => Promise<Parsed[]>
+  saveToDb: () => Promise<void>
 }
 
 declare global {
