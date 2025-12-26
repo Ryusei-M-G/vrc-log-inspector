@@ -48,3 +48,36 @@ export const getLogsByDate = async (startDate: string, endDate: string) => {
     return []
   }
 }
+
+export const searchLogs = async (searchText: string) => {
+  try {
+    const result = await prisma.event.findMany({
+      where: {
+        OR: [
+          {
+            message: {
+              contains: searchText
+            }
+          },
+          {
+            category: {
+              contains: searchText
+            }
+          },
+          {
+            loglevel: {
+              contains: searchText
+            }
+          }
+        ]
+      },
+      orderBy: {
+        timeStamp: 'asc'
+      }
+    })
+    return result
+  } catch (error) {
+    console.log(error)
+    return []
+  }
+}

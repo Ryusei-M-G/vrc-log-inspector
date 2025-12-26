@@ -5,6 +5,7 @@ interface Api {
   getLog: () => Promise<Parsed[]>
   saveToDb: () => Promise<void>
   getLogsByDate: (startDate: string, endDate: string) => Promise<Parsed[]>
+  searchLogs: (searchText: string) => Promise<Parsed[]>
 }
 
 declare global {

@@ -5,7 +5,8 @@ import { electronAPI } from '@electron-toolkit/preload'
 const api = {
   getLog: () => ipcRenderer.invoke('getLog'),
   saveToDb: () => ipcRenderer.invoke('saveToDb'),
-  getLogsByDate: (startDate: string, endDate: string) => ipcRenderer.invoke('getLogsByDate', startDate, endDate)
+  getLogsByDate: (startDate: string, endDate: string) => ipcRenderer.invoke('getLogsByDate', startDate, endDate),
+  searchLogs: (searchText: string) => ipcRenderer.invoke('searchLogs', searchText)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

@@ -10,12 +10,16 @@ function App(): React.JSX.Element {
   const [endDate, setEndDate] = useState<string>('');
   const [startTime, setStartTime] = useState<string>('');
   const [endTime, setEndTime] = useState<string>('');
+  const [searchText, setSearchText] = useState<string>('');
 
   const handleReadFile = async (): Promise<void> => {
     try {
       setLoadingLogs(true)
 
-      if (startDate && endDate) {
+      if (searchText) {
+        const data = await window.api.searchLogs(searchText)
+        setLogs(data)
+      } else if (startDate && endDate) {
         const start = `${startDate}T${startTime || '00:00:00'}`
         const end = `${endDate}T${endTime || '23:59:59'}`
         const data = await window.api.getLogsByDate(start, end)
@@ -61,6 +65,13 @@ function App(): React.JSX.Element {
             </span>
           </div>
         )}
+        <input
+          type="text"
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          placeholder="Search..."
+          className={inputStyle}
+        />
         <div className="ml-auto flex items-center gap-2">
           <div className="flex items-center gap-1">
             <input
