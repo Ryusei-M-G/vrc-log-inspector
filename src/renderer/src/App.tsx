@@ -4,8 +4,6 @@ import LogMonitor from './components/LogMonitor'
 
 function App(): React.JSX.Element {
   const [logs, setLogs] = useState<Parsed[]>([]);
-  const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
-  const nyowaHandle = (): void => window.electron.ipcRenderer.send('nyowa')
   const handleReadFile = async (): Promise<void> => {
     const data = await window.api.readFile()
     setLogs(data)
@@ -15,8 +13,6 @@ function App(): React.JSX.Element {
   return (
     <div className="h-screen flex flex-col bg-zinc-800 text-white">
       <header className="h-14 shrink-0 flex items-center gap-2 px-4 bg-zinc-900 border-b border-zinc-700">
-        <button onClick={ipcHandle} className={buttonStyle}>button</button>
-        <button onClick={nyowaHandle} className={buttonStyle}>nyowa</button>
         <button onClick={handleReadFile} className={buttonStyle}>readFile</button>
       </header>
 
