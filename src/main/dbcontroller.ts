@@ -28,3 +28,23 @@ export const getLogs = async () => {
     return error;
   }
 }
+
+export const getLogsByDate = async (startDate: string, endDate: string) => {
+  try {
+    const result = await prisma.event.findMany({
+      where: {
+        timeStamp: {
+          gte: new Date(startDate),
+          lte: new Date(endDate)
+        }
+      },
+      orderBy: {
+        timeStamp: 'asc'
+      }
+    })
+    return result
+  } catch (error) {
+    console.log(error)
+    return []
+  }
+}

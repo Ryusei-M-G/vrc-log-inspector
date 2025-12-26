@@ -14,10 +14,18 @@ function App(): React.JSX.Element {
   const handleReadFile = async (): Promise<void> => {
     try {
       setLoadingLogs(true)
-      const data = await window.api.getLog()
-      setLogs(data)
+
+      if (startDate && endDate) {
+        const start = `${startDate}T${startTime || '00:00:00'}`
+        const end = `${endDate}T${endTime || '23:59:59'}`
+        const data = await window.api.getLogsByDate(start, end)
+        setLogs(data)
+      } else {
+        const data = await window.api.getLog()
+        setLogs(data)
+      }
     } catch (err) {
-      //wip
+      console.error(err)
     } finally {
       setLoadingLogs(false)
     }
@@ -58,7 +66,10 @@ function App(): React.JSX.Element {
             <input
               type="date"
               value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
+              onChange={(e) => {
+                setStartDate(e.target.value)
+                setEndDate(e.target.value)
+              }}
               className={inputStyle}
               placeholder="Start Date"
             />

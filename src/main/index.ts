@@ -4,7 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 
 import { readFile } from './vrc-log-read'
-import { saveLogsToDb, getLogs } from './dbcontroller'
+import { saveLogsToDb, getLogs, getLogsByDate } from './dbcontroller'
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -50,6 +50,11 @@ app.whenReady().then(() => {
   //IPC
   ipcMain.handle('getLog', async () => {
     const dbLog = await getLogs()
+    return dbLog;
+  })
+
+  ipcMain.handle('getLogsByDate', async (_event, startDate: string, endDate: string) => {
+    const dbLog = await getLogsByDate(startDate, endDate)
     return dbLog;
   })
 
