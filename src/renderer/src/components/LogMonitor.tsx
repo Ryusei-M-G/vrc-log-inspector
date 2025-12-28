@@ -1,10 +1,11 @@
+import { memo } from 'react'
 import type { Parsed } from "src/types"
 
 interface LogMonitorProps {
   logs: Parsed[]
 }
 
-const LogMonitor = ({ logs }: LogMonitorProps) => {
+const LogMonitor = memo(({ logs }: LogMonitorProps) => {
   const formatDateTime = (dateTime: Date | string | undefined) => {
     if (!dateTime) return ''
     const date = new Date(dateTime)
@@ -32,6 +33,8 @@ const LogMonitor = ({ logs }: LogMonitorProps) => {
       })}
     </div>
   )
-}
+})
+
+LogMonitor.displayName = 'LogMonitor'
 
 export default LogMonitor
