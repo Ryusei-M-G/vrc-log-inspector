@@ -86,8 +86,8 @@ function App(): React.JSX.Element {
   const isAnyLoading = isLoadingLogs || isLoadingDb
 
   return (
-    <div className="h-screen flex flex-col bg-zinc-800 text-white">
-      <header className="h-14 shrink-0 flex items-center gap-2 px-4 bg-zinc-900 border-b border-zinc-700">
+    <div className="h-screen overflow-y-auto bg-zinc-800 text-white">
+      <header className="sticky top-0 z-20 h-14 flex items-center gap-2 px-4 bg-zinc-900/70 backdrop-blur-xl border-b border-zinc-700/50">
         <button onClick={handleDB} className={buttonStyle} disabled={isLoadingDb}>
           {isLoadingDb ? 'Saving...' : 'db'}
         </button>
@@ -151,7 +151,7 @@ function App(): React.JSX.Element {
       </header>
 
       {/* Tabs Bar */}
-      <div className="shrink-0 flex items-center gap-1 px-2 py-1 bg-zinc-900 border-b border-zinc-700 overflow-x-auto">
+      <div className="sticky top-14 z-10 flex items-center gap-1 px-2 py-1 bg-zinc-900/70 backdrop-blur-xl border-b border-zinc-700/50 overflow-x-auto">
         {tabs.map(tab => (
           <div
             key={tab.id}
@@ -179,7 +179,7 @@ function App(): React.JSX.Element {
         ))}
       </div>
 
-      <main className="flex-1 overflow-y-auto p-4">
+      <main className="min-h-screen p-4">
         {isLoadingLogs ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
