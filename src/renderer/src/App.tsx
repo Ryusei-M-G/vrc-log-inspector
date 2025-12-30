@@ -1,9 +1,14 @@
 import { useState } from 'react'
-import type { Parsed } from '../../types'
+import type { Parsed, Tab } from '../../types'
 import LogMonitor from './components/LogMonitor'
 
+const MAIN_TAB_ID = 'main'
+
 function App(): React.JSX.Element {
-  const [logs, setLogs] = useState<Parsed[]>([]);
+  const [tabs, setTabs] = useState<Tab[]>([
+    { id: MAIN_TAB_ID, label: 'All Logs', logs: [], isMain: true }
+  ])
+  const [activeTabId, setActiveTabId] = useState<string>(MAIN_TAB_ID)
   const [isLoadingLogs, setLoadingLogs] = useState(false);
   const [isLoadingDb, setLoadingDb] = useState(false);
   const [startDate, setStartDate] = useState<string>('');
@@ -12,21 +17,51 @@ function App(): React.JSX.Element {
   const [endTime, setEndTime] = useState<string>('');
   const [searchText, setSearchText] = useState<string>('');
 
+  const activeTab = tabs.find(t => t.id === activeTabId) || tabs[0]
+
+  const updateTabLogs = (tabId: string, logs: Parsed[]) => {
+    setTabs(prev => prev.map(tab =>
+      tab.id === tabId ? { ...tab, logs } : tab
+    ))
+  }
+
+  const createSearchTab = (searchQuery: string, logs: Parsed[]) => {
+    const newTabId = `search-${Date.now()}`
+    const newTab: Tab = {
+      id: newTabId,
+      label: searchQuery,
+      logs
+    }
+    setTabs(prev => [...prev, newTab])
+    setActiveTabId(newTabId)
+  }
+
+  const closeTab = (tabId: string) => {
+    if (tabId === MAIN_TAB_ID) return
+    setTabs(prev => prev.filter(tab => tab.id !== tabId))
+    if (activeTabId === tabId) {
+      setActiveTabId(MAIN_TAB_ID)
+    }
+  }
+
   const handleReadFile = async (): Promise<void> => {
     try {
       setLoadingLogs(true)
 
       if (searchText) {
         const data = await window.api.searchLogs(searchText)
-        setLogs(data)
+        createSearchTab(searchText, data)
+        setSearchText('')
       } else if (startDate && endDate) {
         const start = `${startDate}T${startTime || '00:00:00'}`
         const end = `${endDate}T${endTime || '23:59:59'}`
         const data = await window.api.getLogsByDate(start, end)
-        setLogs(data)
+        updateTabLogs(MAIN_TAB_ID, data)
+        setActiveTabId(MAIN_TAB_ID)
       } else {
         const data = await window.api.getLog()
-        setLogs(data)
+        updateTabLogs(MAIN_TAB_ID, data)
+        setActiveTabId(MAIN_TAB_ID)
       }
     } catch (err) {
       console.error(err)
@@ -115,6 +150,35 @@ function App(): React.JSX.Element {
         </div>
       </header>
 
+      {/* Tabs Bar */}
+      <div className="shrink-0 flex items-center gap-1 px-2 py-1 bg-zinc-900 border-b border-zinc-700 overflow-x-auto">
+        {tabs.map(tab => (
+          <div
+            key={tab.id}
+            className={`flex items-center gap-1 px-3 py-1.5 rounded-t-md cursor-pointer text-sm transition-colors ${
+              activeTabId === tab.id
+                ? 'bg-zinc-700 text-white'
+                : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700/50 hover:text-zinc-300'
+            }`}
+            onClick={() => setActiveTabId(tab.id)}
+          >
+            <span className="max-w-32 truncate">{tab.label}</span>
+            <span className="text-xs text-zinc-500">({tab.logs.length})</span>
+            {!tab.isMain && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  closeTab(tab.id)
+                }}
+                className="ml-1 text-zinc-500 hover:text-white hover:bg-zinc-600 rounded px-1"
+              >
+                ×
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+
       <main className="flex-1 overflow-y-auto p-4">
         {isLoadingLogs ? (
           <div className="flex items-center justify-center h-full">
@@ -126,9 +190,9 @@ function App(): React.JSX.Element {
         ) : (
           <>
             <div className="mb-4">
-              <h2 className="text-lg font-bold">Logs ({logs.length})</h2>
+              <h2 className="text-lg font-bold">{activeTab.label} ({activeTab.logs.length})</h2>
             </div>
-            <LogMonitor logs={logs} />
+            <LogMonitor logs={activeTab.logs} />
           </>
         )}
       </main>

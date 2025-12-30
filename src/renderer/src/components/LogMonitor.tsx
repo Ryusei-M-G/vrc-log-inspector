@@ -36,7 +36,7 @@ const LogMonitor = memo(({ logs }: LogMonitorProps) => {
     }
   }
 
-  const getCategoryStyle = (category: string | null | undefined) => {
+  const getCategoryStyle = (_category: string | null | undefined) => {
     return 'bg-zinc-700/50 text-zinc-300 border-zinc-600/50'
   }
 
