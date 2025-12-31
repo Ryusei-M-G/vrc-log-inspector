@@ -201,6 +201,12 @@ function App(): React.JSX.Element {
           >
             Room
           </Button>
+          <Button
+            onClick={() => setSearchText('URL')}
+            className="text-sm"
+          >
+            URL
+          </Button>
         </div>
       </header>
 
