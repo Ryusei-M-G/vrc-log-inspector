@@ -2,7 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
 export interface SearchOptions {
-  searchText?: string
+  searchTerms?: string[]
   startDate?: string
   endDate?: string
 }

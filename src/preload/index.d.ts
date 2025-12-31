@@ -2,7 +2,7 @@ import { ElectronAPI } from '@electron-toolkit/preload'
 import type { Parsed } from '../types'
 
 interface SearchOptions {
-  searchText?: string
+  searchTerms?: string[]
   startDate?: string
   endDate?: string
 }

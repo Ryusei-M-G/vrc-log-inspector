@@ -19,7 +19,7 @@ function App(): React.JSX.Element {
   const [isLoadingLogs, setLoadingLogs] = useState(false)
   const [isLoadingDb, setLoadingDb] = useState(false)
   const [dateRange, setDateRange] = useState<DateTimeRange>(initialDateRange)
-  const [searchText, setSearchText] = useState('')
+  const [searchTerms, setSearchTerms] = useState<string[]>(['', ''])
   const [scrollToId, setScrollToId] = useState<number | undefined>()
   const [smoothScroll, setSmoothScroll] = useState(true)
 
@@ -32,11 +32,26 @@ function App(): React.JSX.Element {
 
   const hasDateRange = dateRange.startDate && dateRange.endDate
 
+  const activeSearchTerms = searchTerms.filter((t) => t.trim())
+
   const buildSearchLabel = (): string => {
     const parts: string[] = []
-    if (searchText) parts.push(searchText)
+    if (activeSearchTerms.length > 0) parts.push(activeSearchTerms.join(' | '))
     if (hasDateRange) parts.push(`${dateRange.startDate}~${dateRange.endDate}`)
-    return parts.join(' | ')
+    return parts.join(' / ')
+  }
+
+  const updateSearchTerm = (index: number, value: string): void => {
+    setSearchTerms((prev) => prev.map((t, i) => (i === index ? value : t)))
+  }
+
+  const addSearchTerm = (): void => {
+    setSearchTerms((prev) => [...prev, ''])
+  }
+
+  const removeSearchTerm = (index: number): void => {
+    if (searchTerms.length <= 1) return
+    setSearchTerms((prev) => prev.filter((_, i) => i !== index))
   }
 
   const getDateRangeDays = (): number => {
@@ -64,15 +79,15 @@ function App(): React.JSX.Element {
       setLoadingLogs(true)
 
       const options = {
-        searchText: searchText || undefined,
+        searchTerms: activeSearchTerms.length > 0 ? activeSearchTerms : undefined,
         startDate: `${dateRange.startDate}T${dateRange.startTime || '00:00:00'}`,
         endDate: `${dateRange.endDate}T${dateRange.endTime || '23:59:59'}`
       }
       const data = await window.api.searchLogs(options)
 
-      if (searchText) {
+      if (activeSearchTerms.length > 0) {
         createSearchTab(buildSearchLabel(), data)
-        setSearchText('')
+        setSearchTerms(['', ''])
       } else {
         // Date-only search: update main tab
         const dateLabel =
@@ -138,7 +153,7 @@ function App(): React.JSX.Element {
       endDate: endDateStr,
       endTime: ''
     })
-    setSearchText('')
+    setSearchTerms(['', ''])
 
     // Always fetch and update the main tab
     try {
@@ -160,16 +175,9 @@ function App(): React.JSX.Element {
   return (
     <div className="h-screen overflow-y-auto bg-zinc-800 text-white">
       <header className="sticky top-0 z-20 flex flex-col gap-2 px-4 py-2 bg-zinc-900/70 backdrop-blur-xl border-b border-zinc-700/50">
-        {/* Row 1: Date filters, Search, getLog, Sync */}
+        {/* Row 1: Date filters and actions */}
         <div className="flex items-center gap-2">
           <DateTimeRangeFilter value={dateRange} onChange={setDateRange} />
-          <Input
-            type="text"
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            placeholder="Search..."
-            className="flex-1"
-          />
           <Button
             onClick={handleSearch}
             loading={isLoadingLogs}
@@ -187,22 +195,49 @@ function App(): React.JSX.Element {
           )}
         </div>
 
-        {/* Row 2: Template buttons */}
+        {/* Row 2: Search inputs */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {searchTerms.map((term, index) => (
+            <div key={index} className="flex items-center gap-1">
+              {index > 0 && <span className="text-zinc-500 text-sm">OR</span>}
+              <Input
+                type="text"
+                value={term}
+                onChange={(e) => updateSearchTerm(index, e.target.value)}
+                placeholder={`検索${index + 1}`}
+                className="w-40"
+              />
+              {searchTerms.length > 1 && (
+                <button
+                  onClick={() => removeSearchTerm(index)}
+                  className="text-zinc-500 hover:text-white px-1"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          ))}
+          <Button onClick={addSearchTerm} className="text-sm px-2">
+            +
+          </Button>
+        </div>
+
+        {/* Row 3: Template buttons */}
         <div className="flex items-center gap-2">
           <Button
-            onClick={() => setSearchText('OnPlayerJoined OnPlayerLeft')}
+            onClick={() => setSearchTerms(['OnPlayerJoined', 'OnPlayerLeft'])}
             className="text-sm"
           >
             Join/Left
           </Button>
           <Button
-            onClick={() => setSearchText('Joining OnLeftRoom')}
+            onClick={() => setSearchTerms(['Joining', 'OnLeftRoom'])}
             className="text-sm"
           >
             Room
           </Button>
           <Button
-            onClick={() => setSearchText('URL')}
+            onClick={() => setSearchTerms(['URL'])}
             className="text-sm"
           >
             URL

@@ -50,20 +50,19 @@ export const getLogsByDate = async (startDate: string, endDate: string) => {
 }
 
 export interface SearchOptions {
-  searchText?: string
+  searchTerms?: string[]
   startDate?: string
   endDate?: string
 }
 
 export const searchLogs = async (options: SearchOptions) => {
   try {
-    const { searchText, startDate, endDate } = options
+    const { searchTerms, startDate, endDate } = options
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const conditions: any[] = []
 
-    if (searchText) {
-      const terms = searchText.split(/\s+/).filter((t) => t.length > 0)
-      const textConditions = terms.flatMap((term) => [
+    if (searchTerms && searchTerms.length > 0) {
+      const textConditions = searchTerms.flatMap((term) => [
         { message: { contains: term } },
         { category: { contains: term } },
         { loglevel: { contains: term } }

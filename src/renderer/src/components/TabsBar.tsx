@@ -27,7 +27,7 @@ export function TabsBar({
   onTabClose
 }: TabsBarProps): React.JSX.Element {
   return (
-    <div className="sticky top-[100px] z-10 flex items-center gap-1 px-2 py-1 bg-zinc-900/70 backdrop-blur-xl border-b border-zinc-700/50 overflow-x-auto">
+    <div className="sticky top-[140px] z-10 flex items-center gap-1 px-2 py-1 bg-zinc-900/70 backdrop-blur-xl border-b border-zinc-700/50 overflow-x-auto">
       {tabs.map((tab) => (
         <div
           key={tab.id}
