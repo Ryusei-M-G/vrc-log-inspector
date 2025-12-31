@@ -159,37 +159,42 @@ function App(): React.JSX.Element {
 
   return (
     <div className="h-screen overflow-y-auto bg-zinc-800 text-white">
-      <header className="sticky top-0 z-20 h-14 flex items-center gap-2 px-4 bg-zinc-900/70 backdrop-blur-xl border-b border-zinc-700/50">
-        <Button onClick={handleSaveToDb} loading={isLoadingDb} loadingText="Saving...">
-          db
-        </Button>
+      <header className="sticky top-0 z-20 flex flex-col gap-2 px-4 py-2 bg-zinc-900/70 backdrop-blur-xl border-b border-zinc-700/50">
+        {/* Row 1: DB, Search, Template buttons */}
+        <div className="flex items-center gap-2">
+          <Button onClick={handleSaveToDb} loading={isLoadingDb} loadingText="Saving...">
+            db
+          </Button>
 
-        {isAnyLoading && (
-          <Spinner message={isLoadingLogs ? 'Loading logs...' : 'Saving to database...'} />
-        )}
+          {isAnyLoading && (
+            <Spinner message={isLoadingLogs ? 'Loading logs...' : 'Saving to database...'} />
+          )}
 
-        <Input
-          type="text"
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-          placeholder="Search..."
-        />
+          <Input
+            type="text"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            placeholder="Search..."
+            className="flex-1"
+          />
 
-        <Button
-          onClick={() => setSearchText('OnPlayerJoined OnPlayerLeft')}
-          className="text-sm"
-        >
-          Join/Left
-        </Button>
+          <Button
+            onClick={() => setSearchText('OnPlayerJoined OnPlayerLeft')}
+            className="text-sm"
+          >
+            Join/Left
+          </Button>
 
-        <Button
-          onClick={() => setSearchText('Joining OnLeftRoom')}
-          className="text-sm"
-        >
-          Room
-        </Button>
+          <Button
+            onClick={() => setSearchText('Joining OnLeftRoom')}
+            className="text-sm"
+          >
+            Room
+          </Button>
+        </div>
 
-        <div className="ml-auto flex items-center gap-2">
+        {/* Row 2: Date filters */}
+        <div className="flex items-center gap-2">
           <DateTimeRangeFilter value={dateRange} onChange={setDateRange} />
           <Button
             onClick={handleSearch}
