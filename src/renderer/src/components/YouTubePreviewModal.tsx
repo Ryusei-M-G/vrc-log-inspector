@@ -1,35 +1,19 @@
-import { useEffect, useCallback } from 'react'
+import { useEffect } from 'react'
+import { extractVideoId } from '../utils/youtube'
 
 interface YouTubePreviewModalProps {
   url: string | null
   onClose: () => void
 }
 
-const extractVideoId = (url: string): string | null => {
-  // Handle youtu.be/VIDEO_ID
-  const shortMatch = url.match(/youtu\.be\/([a-zA-Z0-9_-]+)/)
-  if (shortMatch) return shortMatch[1]
-
-  // Handle youtube.com/watch?v=VIDEO_ID
-  const longMatch = url.match(/youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/)
-  if (longMatch) return longMatch[1]
-
-  // Handle youtube.com/embed/VIDEO_ID
-  const embedMatch = url.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/)
-  if (embedMatch) return embedMatch[1]
-
-  return null
-}
-
 export function YouTubePreviewModal({ url, onClose }: YouTubePreviewModalProps): React.JSX.Element | null {
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.key === 'Escape') onClose()
-  }, [onClose])
-
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent): void => {
+      if (e.key === 'Escape') onClose()
+    }
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [handleKeyDown])
+  }, [onClose])
 
   if (!url) return null
 
