@@ -160,16 +160,9 @@ function App(): React.JSX.Element {
   return (
     <div className="h-screen overflow-y-auto bg-zinc-800 text-white">
       <header className="sticky top-0 z-20 flex flex-col gap-2 px-4 py-2 bg-zinc-900/70 backdrop-blur-xl border-b border-zinc-700/50">
-        {/* Row 1: DB, Search, Template buttons */}
+        {/* Row 1: Date filters, Search, getLog, Sync */}
         <div className="flex items-center gap-2">
-          <Button onClick={handleSaveToDb} loading={isLoadingDb} loadingText="Saving...">
-            db
-          </Button>
-
-          {isAnyLoading && (
-            <Spinner message={isLoadingLogs ? 'Loading logs...' : 'Saving to database...'} />
-          )}
-
+          <DateTimeRangeFilter value={dateRange} onChange={setDateRange} />
           <Input
             type="text"
             value={searchText}
@@ -177,32 +170,36 @@ function App(): React.JSX.Element {
             placeholder="Search..."
             className="flex-1"
           />
+          <Button
+            onClick={handleSearch}
+            loading={isLoadingLogs}
+            loadingText="Searching..."
+            disabled={!hasDateRange}
+            variant="primary"
+          >
+            Search
+          </Button>
+          <Button onClick={handleSaveToDb} loading={isLoadingDb} loadingText="Syncing...">
+            sync
+          </Button>
+          {isAnyLoading && (
+            <Spinner message={isLoadingLogs ? 'Loading logs...' : 'Syncing...'} />
+          )}
+        </div>
 
+        {/* Row 2: Template buttons */}
+        <div className="flex items-center gap-2">
           <Button
             onClick={() => setSearchText('OnPlayerJoined OnPlayerLeft')}
             className="text-sm"
           >
             Join/Left
           </Button>
-
           <Button
             onClick={() => setSearchText('Joining OnLeftRoom')}
             className="text-sm"
           >
             Room
-          </Button>
-        </div>
-
-        {/* Row 2: Date filters */}
-        <div className="flex items-center gap-2">
-          <DateTimeRangeFilter value={dateRange} onChange={setDateRange} />
-          <Button
-            onClick={handleSearch}
-            loading={isLoadingLogs}
-            loadingText="Loading..."
-            disabled={!hasDateRange}
-          >
-            getLog
           </Button>
         </div>
       </header>

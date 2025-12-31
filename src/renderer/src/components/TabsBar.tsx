@@ -9,10 +9,10 @@ interface TabsBarProps {
 
 const getTabStyle = (tab: Tab, isActive: boolean): string => {
   if (tab.isMain) {
-    // Main tab: blue theme
+    // Main tab: cyan theme
     return isActive
-      ? 'bg-blue-600 text-white'
-      : 'bg-blue-900/50 text-blue-300 hover:bg-blue-800/50 hover:text-blue-200'
+      ? 'bg-cyan-600 text-white'
+      : 'bg-cyan-900/50 text-cyan-300 hover:bg-cyan-800/50 hover:text-cyan-200'
   }
   // Search tabs: gray theme
   return isActive
@@ -35,7 +35,7 @@ export function TabsBar({
           onClick={() => onTabSelect(tab.id)}
         >
           <span className="max-w-32 truncate">{tab.label}</span>
-          <span className={`text-xs ${tab.isMain ? 'text-blue-300/70' : 'text-zinc-500'}`}>
+          <span className={`text-xs ${tab.isMain ? 'text-cyan-300/70' : 'text-zinc-500'}`}>
             ({tab.logs.length})
           </span>
           {!tab.isMain && (
