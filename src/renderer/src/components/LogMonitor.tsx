@@ -1,5 +1,49 @@
-import { memo } from 'react'
+import { memo, useCallback, useState } from 'react'
 import type { Parsed } from '../../../types'
+import { YouTubePreviewModal } from './YouTubePreviewModal'
+
+const YOUTUBE_URL_REGEX = /'(https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)[^']+)'/g
+
+const extractYouTubeUrl = (message: string): string | null => {
+  const match = message.match(/'(https?:\/\/(?:www\.)?(?:youtube\.com|youtu\.be)[^']+)'/)
+  return match ? match[1] : null
+}
+
+const parseMessageWithUrls = (
+  message: string,
+  onUrlClick: (url: string) => void
+): React.ReactNode[] => {
+  const regex = new RegExp(YOUTUBE_URL_REGEX.source, 'g')
+  const parts: React.ReactNode[] = []
+  let lastIndex = 0
+  let match: RegExpExecArray | null
+
+  while ((match = regex.exec(message)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(message.slice(lastIndex, match.index))
+    }
+    const url = match[1]
+    parts.push(
+      <button
+        key={match.index}
+        onClick={(e) => {
+          e.stopPropagation()
+          onUrlClick(url)
+        }}
+        className="text-cyan-400 hover:text-cyan-300 hover:underline"
+      >
+        '{url}'
+      </button>
+    )
+    lastIndex = match.index + match[0].length
+  }
+
+  if (lastIndex < message.length) {
+    parts.push(message.slice(lastIndex))
+  }
+
+  return parts.length > 0 ? parts : [message]
+}
 
 interface LogMonitorProps {
   logs: Parsed[]
@@ -35,6 +79,8 @@ const getLogLevelStyle = (level: string | null | undefined): string =>
   LOG_LEVEL_STYLES[level?.toLowerCase() ?? ''] ?? DEFAULT_LEVEL_STYLE
 
 const LogMonitor = memo(({ logs, onLogClick, scrollToId, smoothScroll = true }: LogMonitorProps) => {
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+
   const scrollToElement = (el: HTMLDivElement | null): void => {
     if (el && scrollToId) {
       if (smoothScroll) {
@@ -49,45 +95,59 @@ const LogMonitor = memo(({ logs, onLogClick, scrollToId, smoothScroll = true }: 
     }
   }
 
+  const handleUrlClick = useCallback((url: string) => {
+    setPreviewUrl(url)
+  }, [])
+
   return (
-    <div className="space-y-2">
-      {logs.map((log) => (
-        <div
-          key={log.id}
-          ref={log.id === scrollToId ? scrollToElement : undefined}
-          className={`border border-zinc-700 rounded-lg p-3 bg-zinc-900 ${log.id === scrollToId ? 'ring-2 ring-cyan-500' : ''}`}
-        >
-        <div className="flex items-center gap-2 mb-2 flex-wrap">
-          <span className="text-xs text-zinc-500 font-mono">{formatDateTime(log.timeStamp)}</span>
-          {log.loglevel && (
-            <span
-              className={`text-xs px-2 py-0.5 rounded border font-medium ${getLogLevelStyle(log.loglevel)}`}
+    <>
+      <div className="space-y-2">
+        {logs.map((log) => {
+          const youtubeUrl = log.message ? extractYouTubeUrl(log.message) : null
+          return (
+            <div
+              key={log.id}
+              ref={log.id === scrollToId ? scrollToElement : undefined}
+              className={`border border-zinc-700 rounded-lg p-3 bg-zinc-900 ${log.id === scrollToId ? 'ring-2 ring-cyan-500' : ''} ${youtubeUrl ? 'cursor-pointer hover:bg-zinc-800/80 transition-colors' : ''}`}
+              onClick={() => youtubeUrl && handleUrlClick(youtubeUrl)}
             >
-              {log.loglevel.toUpperCase()}
-            </span>
-          )}
-          {log.category && (
-            <span className={`text-xs px-2 py-0.5 rounded border ${CATEGORY_STYLE}`}>
-              {log.category}
-            </span>
-          )}
-          {onLogClick && (
-            <button
-              onClick={() => onLogClick(log)}
-              className="ml-auto text-xs px-2 py-0.5 rounded bg-zinc-700 hover:bg-zinc-600 text-zinc-300 hover:text-white transition-colors"
-            >
-              jump
-            </button>
-          )}
-        </div>
-        {log.message && (
-          <div className="text-sm text-zinc-200 leading-relaxed break-words whitespace-pre-wrap font-mono bg-zinc-800/50 rounded px-2 py-1.5">
-            {log.message}
-          </div>
-        )}
+              <div className="flex items-center gap-2 mb-2 flex-wrap">
+                <span className="text-xs text-zinc-500 font-mono">{formatDateTime(log.timeStamp)}</span>
+                {log.loglevel && (
+                  <span
+                    className={`text-xs px-2 py-0.5 rounded border font-medium ${getLogLevelStyle(log.loglevel)}`}
+                  >
+                    {log.loglevel.toUpperCase()}
+                  </span>
+                )}
+                {log.category && (
+                  <span className={`text-xs px-2 py-0.5 rounded border ${CATEGORY_STYLE}`}>
+                    {log.category}
+                  </span>
+                )}
+                {onLogClick && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onLogClick(log)
+                    }}
+                    className="ml-auto text-xs px-2 py-0.5 rounded bg-zinc-700 hover:bg-zinc-600 text-zinc-300 hover:text-white transition-colors"
+                  >
+                    jump
+                  </button>
+                )}
+              </div>
+              {log.message && (
+                <div className="text-sm text-zinc-200 leading-relaxed break-words whitespace-pre-wrap font-mono bg-zinc-800/50 rounded px-2 py-1.5">
+                  {parseMessageWithUrls(log.message, handleUrlClick)}
+                </div>
+              )}
+            </div>
+          )
+        })}
       </div>
-    ))}
-  </div>
+      <YouTubePreviewModal url={previewUrl} onClose={() => setPreviewUrl(null)} />
+    </>
   )
 })
 

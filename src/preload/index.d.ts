@@ -12,6 +12,7 @@ interface Api {
   saveToDb: () => Promise<void>
   getLogsByDate: (startDate: string, endDate: string) => Promise<Parsed[]>
   searchLogs: (options: SearchOptions) => Promise<Parsed[]>
+  openExternal: (url: string) => Promise<void>
 }
 
 declare global {

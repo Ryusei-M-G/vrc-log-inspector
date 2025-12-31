@@ -67,6 +67,12 @@ app.whenReady().then(() => {
     const result = await readFile()
     await saveLogsToDb(result);
   })
+
+  ipcMain.handle('openExternal', async (_event, url: string) => {
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      await shell.openExternal(url)
+    }
+  })
   createWindow()
 
   app.on('activate', function () {

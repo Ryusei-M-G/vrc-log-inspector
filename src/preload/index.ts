@@ -13,7 +13,8 @@ const api = {
   saveToDb: () => ipcRenderer.invoke('saveToDb'),
   getLogsByDate: (startDate: string, endDate: string) =>
     ipcRenderer.invoke('getLogsByDate', startDate, endDate),
-  searchLogs: (options: SearchOptions) => ipcRenderer.invoke('searchLogs', options)
+  searchLogs: (options: SearchOptions) => ipcRenderer.invoke('searchLogs', options),
+  openExternal: (url: string) => ipcRenderer.invoke('openExternal', url)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
