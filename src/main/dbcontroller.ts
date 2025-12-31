@@ -49,35 +49,40 @@ export const getLogsByDate = async (startDate: string, endDate: string) => {
   }
 }
 
-export const searchLogs = async (searchText: string) => {
+export interface SearchOptions {
+  searchText?: string
+  startDate?: string
+  endDate?: string
+}
+
+export const searchLogs = async (options: SearchOptions) => {
   try {
-    const result = await prisma.event.findMany({
-      where: {
-        OR: [
-          {
-            message: {
-              contains: searchText
-            }
-          },
-          {
-            category: {
-              contains: searchText
-            }
-          },
-          {
-            loglevel: {
-              contains: searchText
-            }
-          }
-        ]
-      },
-      orderBy: {
-        timeStamp: 'asc'
+    const { searchText, startDate, endDate } = options
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const where: any = {}
+
+    if (searchText) {
+      where.OR = [
+        { message: { contains: searchText } },
+        { category: { contains: searchText } },
+        { loglevel: { contains: searchText } }
+      ]
+    }
+
+    if (startDate && endDate) {
+      where.timeStamp = {
+        gte: new Date(startDate),
+        lte: new Date(endDate)
       }
+    }
+
+    const result = await prisma.event.findMany({
+      where: Object.keys(where).length > 0 ? where : undefined,
+      orderBy: { timeStamp: 'asc' }
     })
     return result
   } catch (error) {
-    console.log(error)
+    console.error(error)
     return []
   }
 }

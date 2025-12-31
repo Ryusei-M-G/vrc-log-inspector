@@ -29,19 +29,37 @@ function App(): React.JSX.Element {
 
   const isAnyLoading = isLoadingLogs || isLoadingDb
 
+  const hasDateRange = dateRange.startDate && dateRange.endDate
+
+  const buildSearchLabel = (): string => {
+    const parts: string[] = []
+    if (searchText) parts.push(searchText)
+    if (hasDateRange) parts.push(`${dateRange.startDate}~${dateRange.endDate}`)
+    return parts.join(' | ')
+  }
+
   const handleSearch = async (): Promise<void> => {
     try {
       setLoadingLogs(true)
 
-      if (searchText) {
-        const data = await window.api.searchLogs(searchText)
-        createSearchTab(searchText, data)
-        setSearchText('')
-      } else if (dateRange.startDate && dateRange.endDate) {
-        const start = `${dateRange.startDate}T${dateRange.startTime || '00:00:00'}`
-        const end = `${dateRange.endDate}T${dateRange.endTime || '23:59:59'}`
-        const data = await window.api.getLogsByDate(start, end)
-        updateMainTabLogs(data)
+      if (searchText || hasDateRange) {
+        const options = {
+          searchText: searchText || undefined,
+          startDate: hasDateRange
+            ? `${dateRange.startDate}T${dateRange.startTime || '00:00:00'}`
+            : undefined,
+          endDate: hasDateRange
+            ? `${dateRange.endDate}T${dateRange.endTime || '23:59:59'}`
+            : undefined
+        }
+        const data = await window.api.searchLogs(options)
+
+        if (searchText) {
+          createSearchTab(buildSearchLabel(), data)
+          setSearchText('')
+        } else {
+          updateMainTabLogs(data)
+        }
       } else {
         const data = await window.api.getLog()
         updateMainTabLogs(data)

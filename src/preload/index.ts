@@ -1,12 +1,19 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
+export interface SearchOptions {
+  searchText?: string
+  startDate?: string
+  endDate?: string
+}
+
 // Custom APIs for renderer
 const api = {
   getLog: () => ipcRenderer.invoke('getLog'),
   saveToDb: () => ipcRenderer.invoke('saveToDb'),
-  getLogsByDate: (startDate: string, endDate: string) => ipcRenderer.invoke('getLogsByDate', startDate, endDate),
-  searchLogs: (searchText: string) => ipcRenderer.invoke('searchLogs', searchText)
+  getLogsByDate: (startDate: string, endDate: string) =>
+    ipcRenderer.invoke('getLogsByDate', startDate, endDate),
+  searchLogs: (options: SearchOptions) => ipcRenderer.invoke('searchLogs', options)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
