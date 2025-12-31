@@ -234,7 +234,7 @@ function App(): React.JSX.Element {
             </div>
             <LogMonitor
               logs={activeTab.logs}
-              onLogClick={handleLogClick}
+              onLogClick={activeTab.isMain ? undefined : handleLogClick}
               scrollToId={activeTab.isMain ? scrollToId : undefined}
               smoothScroll={smoothScroll}
             />

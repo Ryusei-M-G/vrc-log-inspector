@@ -55,8 +55,7 @@ const LogMonitor = memo(({ logs, onLogClick, scrollToId, smoothScroll = true }: 
         <div
           key={log.id}
           ref={log.id === scrollToId ? scrollToElement : undefined}
-          className={`border border-zinc-700 rounded-lg p-3 bg-zinc-900 hover:bg-zinc-800/80 transition-colors ${onLogClick ? 'cursor-pointer' : ''} ${log.id === scrollToId ? 'ring-2 ring-blue-500' : ''}`}
-          onClick={() => onLogClick?.(log)}
+          className={`border border-zinc-700 rounded-lg p-3 bg-zinc-900 ${log.id === scrollToId ? 'ring-2 ring-cyan-500' : ''}`}
         >
         <div className="flex items-center gap-2 mb-2 flex-wrap">
           <span className="text-xs text-zinc-500 font-mono">{formatDateTime(log.timeStamp)}</span>
@@ -71,6 +70,14 @@ const LogMonitor = memo(({ logs, onLogClick, scrollToId, smoothScroll = true }: 
             <span className={`text-xs px-2 py-0.5 rounded border ${CATEGORY_STYLE}`}>
               {log.category}
             </span>
+          )}
+          {onLogClick && (
+            <button
+              onClick={() => onLogClick(log)}
+              className="ml-auto text-xs px-2 py-0.5 rounded bg-zinc-700 hover:bg-zinc-600 text-zinc-300 hover:text-white transition-colors"
+            >
+              jump
+            </button>
           )}
         </div>
         {log.message && (
