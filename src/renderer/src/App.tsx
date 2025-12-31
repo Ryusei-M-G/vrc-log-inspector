@@ -38,8 +38,24 @@ function App(): React.JSX.Element {
     return parts.join(' | ')
   }
 
+  const getDateRangeDays = (): number => {
+    if (!hasDateRange) return 0
+    const start = new Date(dateRange.startDate)
+    const end = new Date(dateRange.endDate)
+    const diffTime = Math.abs(end.getTime() - start.getTime())
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1
+  }
+
   const handleSearch = async (): Promise<void> => {
     if (!hasDateRange) return
+
+    const days = getDateRangeDays()
+    if (days >= 3) {
+      const confirmed = window.confirm(
+        `指定された期間は${days}日間です。\n取得に時間がかかる可能性があります。続行しますか？`
+      )
+      if (!confirmed) return
+    }
 
     try {
       setLoadingLogs(true)
