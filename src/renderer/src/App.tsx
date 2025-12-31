@@ -109,6 +109,20 @@ function App(): React.JSX.Element {
           placeholder="Search..."
         />
 
+        <Button
+          onClick={() => setSearchText('OnPlayerJoined OnPlayerLeft')}
+          className="text-sm"
+        >
+          Join/Left
+        </Button>
+
+        <Button
+          onClick={() => setSearchText('Joining OnLeftRoom')}
+          className="text-sm"
+        >
+          Room
+        </Button>
+
         <div className="ml-auto flex items-center gap-2">
           <DateTimeRangeFilter value={dateRange} onChange={setDateRange} />
           <Button

@@ -59,25 +59,31 @@ export const searchLogs = async (options: SearchOptions) => {
   try {
     const { searchText, startDate, endDate } = options
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const where: any = {}
+    const conditions: any[] = []
 
     if (searchText) {
-      where.OR = [
-        { message: { contains: searchText } },
-        { category: { contains: searchText } },
-        { loglevel: { contains: searchText } }
-      ]
-    }
-
-    if (startDate && endDate) {
-      where.timeStamp = {
-        gte: new Date(startDate),
-        lte: new Date(endDate)
+      const terms = searchText.split(/\s+/).filter((t) => t.length > 0)
+      const textConditions = terms.flatMap((term) => [
+        { message: { contains: term } },
+        { category: { contains: term } },
+        { loglevel: { contains: term } }
+      ])
+      if (textConditions.length > 0) {
+        conditions.push({ OR: textConditions })
       }
     }
 
+    if (startDate && endDate) {
+      conditions.push({
+        timeStamp: {
+          gte: new Date(startDate),
+          lte: new Date(endDate)
+        }
+      })
+    }
+
     const result = await prisma.event.findMany({
-      where: Object.keys(where).length > 0 ? where : undefined,
+      where: conditions.length > 0 ? { AND: conditions } : undefined,
       orderBy: { timeStamp: 'asc' }
     })
     return result
