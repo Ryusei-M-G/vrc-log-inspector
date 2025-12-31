@@ -4,6 +4,7 @@ import { Button, Input, Spinner } from './components/ui'
 import { DateTimeRangeFilter, type DateTimeRange } from './components/DateTimeRangeFilter'
 import { TabsBar } from './components/TabsBar'
 import LogMonitor from './components/LogMonitor'
+import type { Parsed } from '../../types'
 
 const initialDateRange: DateTimeRange = {
   startDate: '',
@@ -13,21 +14,21 @@ const initialDateRange: DateTimeRange = {
 }
 
 function App(): React.JSX.Element {
-  const {
-    tabs,
-    activeTab,
-    activeTabId,
-    setActiveTabId,
-    updateMainTabLogs,
-    createSearchTab,
-    closeTab
-  } = useTabs()
+  const { tabs, activeTab, activeTabId, setActiveTabId, setMainTabLogs, createSearchTab, closeTab } =
+    useTabs()
   const [isLoadingLogs, setLoadingLogs] = useState(false)
   const [isLoadingDb, setLoadingDb] = useState(false)
   const [dateRange, setDateRange] = useState<DateTimeRange>(initialDateRange)
   const [searchText, setSearchText] = useState('')
+  const [scrollToId, setScrollToId] = useState<number | undefined>()
+  const [smoothScroll, setSmoothScroll] = useState(true)
 
   const isAnyLoading = isLoadingLogs || isLoadingDb
+
+  const handleTabSelect = (tabId: string): void => {
+    setSmoothScroll(false)
+    setActiveTabId(tabId)
+  }
 
   const hasDateRange = dateRange.startDate && dateRange.endDate
 
@@ -57,6 +58,8 @@ function App(): React.JSX.Element {
       if (!confirmed) return
     }
 
+    setScrollToId(undefined)
+
     try {
       setLoadingLogs(true)
 
@@ -71,7 +74,12 @@ function App(): React.JSX.Element {
         createSearchTab(buildSearchLabel(), data)
         setSearchText('')
       } else {
-        updateMainTabLogs(data)
+        // Date-only search: update main tab
+        const dateLabel =
+          dateRange.startDate === dateRange.endDate
+            ? dateRange.startDate
+            : `${dateRange.startDate}~${dateRange.endDate}`
+        setMainTabLogs(dateLabel, data)
       }
     } catch (err) {
       console.error(err)
@@ -88,6 +96,64 @@ function App(): React.JSX.Element {
       console.error(err)
     } finally {
       setLoadingDb(false)
+    }
+  }
+
+  const formatLocalDate = (d: Date): string => {
+    const year = d.getFullYear()
+    const month = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+
+  const handleLogClick = async (log: Parsed): Promise<void> => {
+    if (!log.timeStamp || !log.id) return
+
+    const date = new Date(log.timeStamp)
+    const hour = date.getHours()
+    const currentDateStr = formatLocalDate(date)
+
+    // If hour is 0 (midnight), include previous day in range
+    const isMidnight = hour === 0
+    let startDateStr: string
+    let endDateStr: string
+    let tabLabel: string
+
+    if (isMidnight) {
+      const prevDate = new Date(date)
+      prevDate.setDate(prevDate.getDate() - 1)
+      startDateStr = formatLocalDate(prevDate)
+      endDateStr = currentDateStr
+      tabLabel = `${startDateStr}~${endDateStr}`
+    } else {
+      startDateStr = currentDateStr
+      endDateStr = currentDateStr
+      tabLabel = currentDateStr
+    }
+
+    // Update the date filter UI
+    setDateRange({
+      startDate: startDateStr,
+      startTime: '',
+      endDate: endDateStr,
+      endTime: ''
+    })
+    setSearchText('')
+
+    // Always fetch and update the main tab
+    try {
+      setLoadingLogs(true)
+      const data = await window.api.searchLogs({
+        startDate: `${startDateStr}T00:00:00`,
+        endDate: `${endDateStr}T23:59:59`
+      })
+      setMainTabLogs(tabLabel, data)
+      setSmoothScroll(true)
+      setScrollToId(log.id)
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoadingLogs(false)
     }
   }
 
@@ -139,7 +205,7 @@ function App(): React.JSX.Element {
       <TabsBar
         tabs={tabs}
         activeTabId={activeTabId}
-        onTabSelect={setActiveTabId}
+        onTabSelect={handleTabSelect}
         onTabClose={closeTab}
       />
 
@@ -158,7 +224,12 @@ function App(): React.JSX.Element {
                 {activeTab.label} ({activeTab.logs.length})
               </h2>
             </div>
-            <LogMonitor logs={activeTab.logs} />
+            <LogMonitor
+              logs={activeTab.logs}
+              onLogClick={handleLogClick}
+              scrollToId={activeTab.isMain ? scrollToId : undefined}
+              smoothScroll={smoothScroll}
+            />
           </>
         )}
       </main>

@@ -3,14 +3,14 @@ import type { Parsed, Tab } from '../../../types'
 
 const MAIN_TAB_ID = 'main'
 
-const initialTabs: Tab[] = [{ id: MAIN_TAB_ID, label: 'All Logs', logs: [], isMain: true }]
+const initialTabs: Tab[] = [{ id: MAIN_TAB_ID, label: 'Logs', logs: [], isMain: true }]
 
 interface UseTabsReturn {
   tabs: Tab[]
   activeTab: Tab
   activeTabId: string
   setActiveTabId: (id: string) => void
-  updateMainTabLogs: (logs: Parsed[]) => void
+  setMainTabLogs: (label: string, logs: Parsed[]) => void
   createSearchTab: (searchQuery: string, logs: Parsed[]) => void
   closeTab: (tabId: string) => void
 }
@@ -24,8 +24,10 @@ export function useTabs(): UseTabsReturn {
     [tabs, activeTabId]
   )
 
-  const updateMainTabLogs = useCallback((logs: Parsed[]) => {
-    setTabs((prev) => prev.map((tab) => (tab.id === MAIN_TAB_ID ? { ...tab, logs } : tab)))
+  const setMainTabLogs = useCallback((label: string, logs: Parsed[]) => {
+    setTabs((prev) =>
+      prev.map((tab) => (tab.id === MAIN_TAB_ID ? { ...tab, label, logs } : tab))
+    )
     setActiveTabId(MAIN_TAB_ID)
   }, [])
 
@@ -46,7 +48,7 @@ export function useTabs(): UseTabsReturn {
     activeTab,
     activeTabId,
     setActiveTabId,
-    updateMainTabLogs,
+    setMainTabLogs,
     createSearchTab,
     closeTab
   }

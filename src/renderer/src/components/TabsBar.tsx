@@ -7,6 +7,19 @@ interface TabsBarProps {
   onTabClose: (id: string) => void
 }
 
+const getTabStyle = (tab: Tab, isActive: boolean): string => {
+  if (tab.isMain) {
+    // Main tab: blue theme
+    return isActive
+      ? 'bg-blue-600 text-white'
+      : 'bg-blue-900/50 text-blue-300 hover:bg-blue-800/50 hover:text-blue-200'
+  }
+  // Search tabs: gray theme
+  return isActive
+    ? 'bg-zinc-700 text-white'
+    : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700/50 hover:text-zinc-300'
+}
+
 export function TabsBar({
   tabs,
   activeTabId,
@@ -18,15 +31,13 @@ export function TabsBar({
       {tabs.map((tab) => (
         <div
           key={tab.id}
-          className={`flex items-center gap-1 px-3 py-1.5 rounded-t-md cursor-pointer text-sm transition-colors ${
-            activeTabId === tab.id
-              ? 'bg-zinc-700 text-white'
-              : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700/50 hover:text-zinc-300'
-          }`}
+          className={`flex items-center gap-1 px-3 py-1.5 rounded-t-md cursor-pointer text-sm transition-colors ${getTabStyle(tab, activeTabId === tab.id)}`}
           onClick={() => onTabSelect(tab.id)}
         >
           <span className="max-w-32 truncate">{tab.label}</span>
-          <span className="text-xs text-zinc-500">({tab.logs.length})</span>
+          <span className={`text-xs ${tab.isMain ? 'text-blue-300/70' : 'text-zinc-500'}`}>
+            ({tab.logs.length})
+          </span>
           {!tab.isMain && (
             <button
               onClick={(e) => {

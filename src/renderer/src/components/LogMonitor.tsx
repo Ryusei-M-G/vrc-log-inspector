@@ -3,6 +3,9 @@ import type { Parsed } from '../../../types'
 
 interface LogMonitorProps {
   logs: Parsed[]
+  onLogClick?: (log: Parsed) => void
+  scrollToId?: number
+  smoothScroll?: boolean
 }
 
 const LOG_LEVEL_STYLES: Record<string, string> = {
@@ -31,13 +34,30 @@ const formatDateTime = (dateTime: Date | string | undefined): string => {
 const getLogLevelStyle = (level: string | null | undefined): string =>
   LOG_LEVEL_STYLES[level?.toLowerCase() ?? ''] ?? DEFAULT_LEVEL_STYLE
 
-const LogMonitor = memo(({ logs }: LogMonitorProps) => (
-  <div className="space-y-2">
-    {logs.map((log) => (
-      <div
-        key={log.id}
-        className="border border-zinc-700 rounded-lg p-3 bg-zinc-900 hover:bg-zinc-800/80 transition-colors"
-      >
+const LogMonitor = memo(({ logs, onLogClick, scrollToId, smoothScroll = true }: LogMonitorProps) => {
+  const scrollToElement = (el: HTMLDivElement | null): void => {
+    if (el && scrollToId) {
+      if (smoothScroll) {
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }, 100)
+      } else {
+        requestAnimationFrame(() => {
+          el.scrollIntoView({ behavior: 'instant', block: 'center' })
+        })
+      }
+    }
+  }
+
+  return (
+    <div className="space-y-2">
+      {logs.map((log) => (
+        <div
+          key={log.id}
+          ref={log.id === scrollToId ? scrollToElement : undefined}
+          className={`border border-zinc-700 rounded-lg p-3 bg-zinc-900 hover:bg-zinc-800/80 transition-colors ${onLogClick ? 'cursor-pointer' : ''} ${log.id === scrollToId ? 'ring-2 ring-blue-500' : ''}`}
+          onClick={() => onLogClick?.(log)}
+        >
         <div className="flex items-center gap-2 mb-2 flex-wrap">
           <span className="text-xs text-zinc-500 font-mono">{formatDateTime(log.timeStamp)}</span>
           {log.loglevel && (
@@ -61,7 +81,8 @@ const LogMonitor = memo(({ logs }: LogMonitorProps) => (
       </div>
     ))}
   </div>
-))
+  )
+})
 
 LogMonitor.displayName = 'LogMonitor'
 
