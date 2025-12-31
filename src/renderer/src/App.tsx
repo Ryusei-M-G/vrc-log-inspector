@@ -39,29 +39,22 @@ function App(): React.JSX.Element {
   }
 
   const handleSearch = async (): Promise<void> => {
+    if (!hasDateRange) return
+
     try {
       setLoadingLogs(true)
 
-      if (searchText || hasDateRange) {
-        const options = {
-          searchText: searchText || undefined,
-          startDate: hasDateRange
-            ? `${dateRange.startDate}T${dateRange.startTime || '00:00:00'}`
-            : undefined,
-          endDate: hasDateRange
-            ? `${dateRange.endDate}T${dateRange.endTime || '23:59:59'}`
-            : undefined
-        }
-        const data = await window.api.searchLogs(options)
+      const options = {
+        searchText: searchText || undefined,
+        startDate: `${dateRange.startDate}T${dateRange.startTime || '00:00:00'}`,
+        endDate: `${dateRange.endDate}T${dateRange.endTime || '23:59:59'}`
+      }
+      const data = await window.api.searchLogs(options)
 
-        if (searchText) {
-          createSearchTab(buildSearchLabel(), data)
-          setSearchText('')
-        } else {
-          updateMainTabLogs(data)
-        }
+      if (searchText) {
+        createSearchTab(buildSearchLabel(), data)
+        setSearchText('')
       } else {
-        const data = await window.api.getLog()
         updateMainTabLogs(data)
       }
     } catch (err) {
@@ -102,7 +95,12 @@ function App(): React.JSX.Element {
 
         <div className="ml-auto flex items-center gap-2">
           <DateTimeRangeFilter value={dateRange} onChange={setDateRange} />
-          <Button onClick={handleSearch} loading={isLoadingLogs} loadingText="Loading...">
+          <Button
+            onClick={handleSearch}
+            loading={isLoadingLogs}
+            loadingText="Loading..."
+            disabled={!hasDateRange}
+          >
             getLog
           </Button>
         </div>
